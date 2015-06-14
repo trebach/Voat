@@ -113,7 +113,7 @@ namespace Voat.Controllers
             }
             catch (Exception)
             {
-                return RedirectToAction("HeavyLoad", "Error");
+                return View("~/Views/Errors/DbNotResponding.cshtml");
             }
         }
 
@@ -162,7 +162,7 @@ namespace Voat.Controllers
             }
             catch (Exception)
             {
-                return RedirectToAction("HeavyLoad", "Error");
+                return View("~/Views/Errors/DbNotResponding.cshtml");
             }
         }
 
@@ -211,7 +211,7 @@ namespace Voat.Controllers
             }
             catch (Exception)
             {
-                return RedirectToAction("HeavyLoad", "Error");
+                return View("~/Views/Errors/DbNotResponding.cshtml");
             }
         }
 
@@ -245,7 +245,7 @@ namespace Voat.Controllers
             }
             catch (Exception)
             {
-                return RedirectToAction("HeavyLoad", "Error");
+                return View("~/Views/Errors/DbNotResponding.cshtml");
             }
         }
 
@@ -276,6 +276,17 @@ namespace Voat.Controllers
             if (!ModelState.IsValid) return View();
             if (privateMessage.Recipient == null || privateMessage.Subject == null || privateMessage.Body == null) return RedirectToAction("Sent", "Messaging");
 
+            if (Karma.CommentKarma(User.Identity.Name) < 100)
+            {
+                bool isCaptchaValid = await ReCaptchaUtility.Validate(Request);
+
+                if (!isCaptchaValid)
+                {
+                    ModelState.AddModelError(string.Empty, "Incorrect recaptcha answer.");
+                    return View();
+                }
+            }
+
             // check if recipient exists
             if (Utils.User.UserExists(privateMessage.Recipient) && !Utils.User.IsUserGloballyBanned(User.Identity.Name))
             {
@@ -298,7 +309,7 @@ namespace Voat.Controllers
                 }
                 catch (Exception)
                 {
-                    return RedirectToAction("HeavyLoad", "Error");
+                    return View("~/Views/Errors/DbNotResponding.cshtml");
                 }
             }
             else
@@ -342,7 +353,7 @@ namespace Voat.Controllers
                 }
                 catch (Exception)
                 {
-                    return RedirectToAction("HeavyLoad", "Error");
+                    return View("~/Views/Errors/DbNotResponding.cshtml");
                 }
             }
             else
